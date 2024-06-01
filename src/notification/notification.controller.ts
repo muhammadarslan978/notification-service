@@ -12,12 +12,19 @@ export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
   @MessagePattern('rabbit-mq-producer')
-  public async execute(@Payload() data: any, @Ctx() context: RmqContext) {
+  public async execute(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ): Promise<void> {
     const channel = context.getChannelRef();
-    const orginalMessage = context.getMessage();
+    const originalMessage = context.getMessage();
 
-    await this.notificationService.sendNotification(data);
-
-    channel.ack(orginalMessage);
+    try {
+      await this.notificationService.sendNotification(data);
+      channel.ack(originalMessage);
+    } catch (error) {
+      console.error('Error processing message:', error.message);
+      // Optionally handle message rejection or requeue logic here
+    }
   }
 }
