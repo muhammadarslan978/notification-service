@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import {
   Ctx,
@@ -16,8 +16,7 @@ export class NotificationController {
     const channel = context.getChannelRef();
     const orginalMessage = context.getMessage();
 
-    console.log('data', data);
-    await this.notificationService.mySuperLongProcessOfUser(data);
+    await this.notificationService.sendNotification(data);
 
     channel.ack(orginalMessage);
   }
